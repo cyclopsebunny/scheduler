@@ -1,0 +1,30 @@
+@import "./tokens.css";
+
+:root {
+  color-scheme: light;
+  font-family: var(--font-family-sans);
+  background-color: var(--color-bg-default-secondary);
+  color: var(--color-text-default-primary);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg-default-secondary);
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+}
+
+h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-default-primary);
+}

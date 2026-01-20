@@ -1,0 +1,51 @@
+:root {
+  --font-family-sans: "Inter", "SF Pro Text", system-ui, sans-serif;
+
+  --color-bg-default-primary: #ffffff; /* DSname.color.system.neutral.000 */
+  --color-bg-default-secondary: #f7f7f7; /* DSname.color.system.neutral.100 */
+  --color-bg-default-tertiary: #ececec; /* DSname.color.system.neutral.200 */
+  --color-bg-brand-primary: #009cde; /* DSname.color.system.accent2.600 */
+  --color-bg-brand-secondary: #e0eeff; /* DSname.color.system.accent2.100 */
+  --color-bg-brand-hover: #05549e; /* DSname.color.system.accent2.700 */
+  --color-bg-brand-secondary-hover: #cae0fc; /* DSname.color.system.accent2.200 */
+  --color-bg-cta-primary: #434343; /* DSname.color.system.neutral.700 */
+  --color-bg-cta-hover: #2b2b2b; /* DSname.color.system.neutral.800 */
+
+  --color-text-default-primary: #17191c; /* DSname.color.system.content.900 */
+  --color-text-default-secondary: rgba(89, 89, 89, 1); /* DSname.color.system.content.500 */
+  --color-text-default-tertiary: #babfcc; /* DSname.color.system.content.400 */
+  --color-text-brand-primary: #0a76db; /* DSname.color.system.accent2.600 */
+  --color-text-brand-on-primary: #e0eeff; /* DSname.color.system.accent2.100 */
+  --color-text-cta-primary: #ececec; /* DSname.color.system.neutral.200 */
+
+  --color-border-default-primary: #32363d; /* DSname.color.system.content.700 */
+  --color-border-default-tertiary: #8a909e; /* DSname.color.system.content.500 */
+  --color-border-panel-primary: #d1d7e3; /* DSname.color.system.content.300 */
+  --color-border-input: #babfcc; /* DSname.color.system.content.400 */
+  --color-border-muted: #e4e8f2; /* DSname.color.system.content.200 */
+
+  --color-icon-default-primary: #17191c; /* DSname.color.system.content.900 */
+  --color-icon-default-secondary: #8a909e; /* DSname.color.system.content.500 */
+  --color-icon-default-tertiary: #babfcc; /* DSname.color.system.content.400 */
+  --color-icon-danger: #ff383c; /* DSname.color.Red.500 */
+
+  --shadow-100: 0px 1px 4px 0px #1313131a;
+  --shadow-200: 0px 1px 4px 0px #13131333, 0px 1px 4px 0px #1313131a;
+  --shadow-300: 0px 4px 4px -1px #13131333, 0px 4px 4px -1px #1313131a;
+  --shadow-400: 0px 16px 32px -4px #13131333, 0px 4px 4px -4px #1313131a;
+  --shadow-500: 0px 16px 16px -8px #13131333, 0px 4px 4px -4px #1313131a;
+  --shadow-600: 0px 16px 32px -8px #13131366;
+
+  --radius-100: 4px;
+  --radius-200: 8px;
+  --radius-400: 16px;
+  --radius-full: 9999px;
+
+  --space-100: 4px;
+  --space-200: 8px;
+  --space-300: 12px;
+  --space-400: 16px;
+  --space-600: 24px;
+  --space-800: 32px;
+  --space-1200: 48px;
+}
