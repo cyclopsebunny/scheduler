@@ -3,7 +3,8 @@ import "../styles/schedule.css";
 import brandLogo from "../assets/myQ.svg";
 import userIcon from "../assets/user.svg";
 import plusIcon from "../assets/plus.svg";
-import deleteIcon from "../assets/delete.svg";
+// Delete icon as data URI for reliable CSS mask support
+const deleteIcon = "data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cpath%20d%3D%22M7.26172%2020.2236H16.9033L17.8584%208.83594H19.8643L18.8193%2021.3066C18.7763%2021.8256%2018.3432%2022.2236%2017.8232%2022.2236H6.3418C5.8218%2022.2236%205.3887%2021.8256%205.3457%2021.3066L4.30078%208.83594H6.30664L7.26172%2020.2236ZM11.084%2018.0645C11.109%2018.6165%2010.6828%2019.0853%2010.1318%2019.1113C10.116%2019.1123%2010.0989%2019.1123%2010.084%2019.1123C9.55416%2019.1122%209.11105%2018.695%209.08594%2018.1592L8.64941%208.83594H10.6514L11.084%2018.0645ZM15.0801%2018.1592C15.055%2018.695%2014.6119%2019.1122%2014.082%2019.1123C14.0661%2019.1123%2014.0501%2019.1123%2014.0342%2019.1113C13.4822%2019.0853%2013.057%2018.6165%2013.082%2018.0645L13.5146%208.83594H15.5176L15.0801%2018.1592ZM15.5273%201.77637C15.7362%201.77649%2015.9052%201.9454%2015.9053%202.1543V2.66309H20.1973C20.4792%202.66313%2020.7485%202.78225%2020.9375%202.99121C21.1274%203.1992%2021.2204%203.47881%2021.1924%203.75977L20.9531%206.24316C20.9041%206.75616%2020.473%207.14746%2019.958%207.14746H4.04199C3.52605%207.1474%203.09587%206.75612%203.04688%206.24316L2.80664%203.75977C2.77964%203.47877%202.8735%203.19921%203.0625%202.99121C3.2524%202.78248%203.52%202.66319%203.80273%202.66309H8.09473V2.1543C8.09476%201.94548%208.26389%201.77661%208.47266%201.77637H15.5273ZM4.90332%204.66309L4.9502%205.14746H19.0498L19.0967%204.66309H4.90332Z%22%20fill%3D%22currentColor%22%2F%3E%0A%3C%2Fsvg%3E";
 import chevronDown from "../assets/chevron-down.svg";
 import facilityIcon from "../assets/facility.svg";
 import starSelected from "../assets/star-selected.svg";
@@ -126,18 +127,104 @@ const vendorOptions = [
 const stopOptions = ["1", "2", "3", "4"];
 
 const siteOptions = [
-  "Cheney Brothers - Statesville, NC",
-  "Cheney Brothers - Miami, FL",
-  "Cheney Brothers - Atlanta, GA",
-  "Cheney Brothers - Dallas, TX",
-  "Cheney Brothers - Chicago, IL",
-  "Cheney Brothers - Los Angeles, CA",
-  "Cheney Brothers - Phoenix, AZ",
-  "Cheney Brothers - Denver, CO",
+  "myQ Enterprise Demo Facility - Statesville, NC",
+  "myQ Enterprise Demo Facility - Miami, FL",
+  "myQ Enterprise Demo Facility - Atlanta, GA",
+  "myQ Enterprise Demo Facility - Dallas, TX",
+  "myQ Enterprise Demo Facility - Chicago, IL",
+  "myQ Enterprise Demo Facility - Los Angeles, CA",
+  "myQ Enterprise Demo Facility - Phoenix, AZ",
+  "myQ Enterprise Demo Facility - Denver, CO",
 ];
 
 const durationOptions = ["30 minutes", "1 hour", "2 hours", "3 hours"];
-const questionOptions = ["Answer 1", "Answer 2", "Answer 3", "Answer 4"];
+const freightServiceTypeOptions = ["LTL (Less-Than-Truckload)", "FTL (Full Truckload)"];
+const storageConsiderationOptions = ["Dry", "Cooler", "Freezer"];
+
+const carrierOptions = [
+  "A. Duie Pyle",
+  "ABF Freight",
+  "ArcBest",
+  "Atlas Van Lines",
+  "Averitt Express",
+  "Bekins Van Lines",
+  "Bennett Motor Express",
+  "Bison Transport",
+  "Boyd Brothers Transportation",
+  "C.R. England",
+  "Cardinal Logistics",
+  "Celadon Group",
+  "Central States Trucking",
+  "Central Transport",
+  "CFI",
+  "Con-way Freight",
+  "Covenant Transport",
+  "Crete Carrier Corporation",
+  "Dart Transit Company",
+  "Dayton Freight Lines",
+  "Dependable Highway Express",
+  "DHL Supply Chain",
+  "Dollar General Logistics",
+  "Echo Global Logistics",
+  "Estes Express Lines",
+  "FedEx Freight",
+  "FedEx Ground",
+  "Forward Air",
+  "Frozen Food Express",
+  "Greatwide Logistics",
+  "Heartland Express",
+  "Holland",
+  "Hub Group",
+  "J.B. Hunt",
+  "J.B. Hunt Dedicated",
+  "KLLM Transport Services",
+  "Knight Transportation",
+  "Landstar System",
+  "Lone Star Transportation",
+  "Marten Transport",
+  "Maverick Transportation",
+  "Mayflower Transit",
+  "Melton Truck Lines",
+  "Midland Transit",
+  "National Van Lines",
+  "NFI Industries",
+  "New Penn",
+  "North American Van Lines",
+  "Old Dominion Freight Line",
+  "P.A.M. Transportation",
+  "Penske Logistics",
+  "Pilot Flying J",
+  "Pitt Ohio",
+  "Prime Inc",
+  "Quality Distribution",
+  "R+L Carriers",
+  "Roadrunner Freight",
+  "Roadrunner Transportation",
+  "Roehl Transport",
+  "Ryder System",
+  "Saia",
+  "Schneider National",
+  "Southeastern Freight",
+  "Southeastern Freight Lines",
+  "Stevens Transport",
+  "Swift Transportation",
+  "TForce Freight",
+  "Total Quality Logistics",
+  "TransAm Trucking",
+  "TransForce",
+  "U.S. Xpress",
+  "Universal Truckload Services",
+  "UPS Freight",
+  "USA Truck",
+  "Viking Freight",
+  "Watkins & Shepard Trucking",
+  "Werner Enterprises",
+  "Western Express",
+  "Wilson Logistics",
+  "XPO Logistics",
+  "Yellow Corporation",
+  "YRC Freight"
+];
 
 const useOverflowState = (ref: RefObject<HTMLElement>) => {
   const [hasOverflow, setHasOverflow] = useState(false);
@@ -232,7 +319,7 @@ type Shipment = {
 };
 
 type SchedulePageProps = {
-  onStepClick?: (step: "shipment" | "schedule" | "driver" | "trailer") => void;
+  onStepClick?: (step: "shipment" | "schedule") => void;
   shipmentType?: "Inbound" | "Outbound";
   onShipmentTypeChange?: (type: "Inbound" | "Outbound") => void;
   loadType?: string;
@@ -242,21 +329,19 @@ type SchedulePageProps = {
   questionAnswers?: {
     question1: string;
     question2: string;
-    question3: string;
-    question4: string;
-    question5: string;
   };
   onQuestionAnswersChange?: (answers: {
     question1: string;
     question2: string;
-    question3: string;
-    question4: string;
-    question5: string;
   }) => void;
   shipments?: Shipment[];
   onShipmentsChange?: (shipments: Shipment[]) => void;
   duration?: string;
   onDurationChange?: (duration: string) => void;
+  selectedCarrier?: string;
+  onSelectedCarrierChange?: (carrier: string) => void;
+  onCancel?: () => void;
+  onTermsClick?: () => void;
 };
 
 const SchedulePage = (props: SchedulePageProps = {}) => {
@@ -274,6 +359,9 @@ const SchedulePage = (props: SchedulePageProps = {}) => {
     onShipmentsChange,
     duration: propDuration,
     onDurationChange,
+    selectedCarrier: propSelectedCarrier,
+    onSelectedCarrierChange,
+    onCancel,
   } = props;
   const [shipments, setShipments] = useState(
     propShipments && propShipments.length > 0 ? propShipments : shipmentsSeed
@@ -284,6 +372,7 @@ const SchedulePage = (props: SchedulePageProps = {}) => {
   const [loadType, setLoadType] = useState(propLoadType || "Live");
   const [productType, setProductType] = useState<"Standard" | "Non Standard">(propProductType || "Standard");
   const [duration, setDuration] = useState(propDuration || "1 hour");
+  const [selectedCarrier, setSelectedCarrier] = useState(propSelectedCarrier || "");
 
   // Sync local state with props when they change
   useEffect(() => {
@@ -316,20 +405,26 @@ const SchedulePage = (props: SchedulePageProps = {}) => {
     }
   }, [duration, onDurationChange]);
 
+  useEffect(() => {
+    if (propSelectedCarrier !== undefined) {
+      setSelectedCarrier(propSelectedCarrier);
+    }
+  }, [propSelectedCarrier]);
+
+  useEffect(() => {
+    if (onSelectedCarrierChange) {
+      onSelectedCarrierChange(selectedCarrier);
+    }
+  }, [selectedCarrier, onSelectedCarrierChange]);
+
   const [question1, setQuestion1] = useState(propQuestionAnswers?.question1 || "");
   const [question2, setQuestion2] = useState(propQuestionAnswers?.question2 || "");
-  const [question3, setQuestion3] = useState(propQuestionAnswers?.question3 || "");
-  const [question4, setQuestion4] = useState(propQuestionAnswers?.question4 || "");
-  const [question5, setQuestion5] = useState(propQuestionAnswers?.question5 || "");
 
   // Sync local state with props when they change
   useEffect(() => {
     if (propQuestionAnswers) {
       setQuestion1(propQuestionAnswers.question1);
       setQuestion2(propQuestionAnswers.question2);
-      setQuestion3(propQuestionAnswers.question3);
-      setQuestion4(propQuestionAnswers.question4);
-      setQuestion5(propQuestionAnswers.question5);
     }
   }, [propQuestionAnswers]);
 
@@ -339,12 +434,9 @@ const SchedulePage = (props: SchedulePageProps = {}) => {
       onQuestionAnswersChange({
         question1,
         question2,
-        question3,
-        question4,
-        question5,
       });
     }
-  }, [question1, question2, question3, question4, question5, onQuestionAnswersChange]);
+  }, [question1, question2, onQuestionAnswersChange]);
 
   // Sync local state with props when they change
   useEffect(() => {
@@ -375,9 +467,9 @@ const SchedulePage = (props: SchedulePageProps = {}) => {
 
   const isNextButtonDisabled = useMemo(() => {
     const hasAllShipmentIds = shipments.length > 0 && shipments.every((shipment) => shipment.id && shipment.id.trim() !== "");
-    const hasAllQuestions = question1 && question2 && question3 && question4 && question5;
+    const hasAllQuestions = question1 && question2;
     return !hasAllShipmentIds || !hasAllQuestions;
-  }, [shipments, question1, question2, question3, question4, question5]);
+  }, [shipments, question1, question2]);
 
   const isAddShipmentDisabled = useMemo(() => {
     const hasEmptyShipmentId = shipments.some((shipment) => !shipment.id || shipment.id.trim() === "");
@@ -527,38 +619,6 @@ const SchedulePage = (props: SchedulePageProps = {}) => {
         >
           <span className="step-dot" />
           <span className="step-label">Schedule</span>
-        </div>
-        <div
-          className={`step ${onStepClick ? "clickable" : ""}`}
-          onClick={() => onStepClick?.("driver")}
-          role={onStepClick ? "button" : undefined}
-          tabIndex={onStepClick ? 0 : undefined}
-          onKeyDown={(e) => {
-            if (onStepClick && (e.key === "Enter" || e.key === " ")) {
-              e.preventDefault();
-              onStepClick("driver");
-            }
-          }}
-          aria-label={onStepClick ? "Go to Driver step" : undefined}
-        >
-          <span className="step-dot" />
-          <span className="step-label">Driver</span>
-        </div>
-        <div
-          className={`step ${onStepClick ? "clickable" : ""}`}
-          onClick={() => onStepClick?.("trailer")}
-          role={onStepClick ? "button" : undefined}
-          tabIndex={onStepClick ? 0 : undefined}
-          onKeyDown={(e) => {
-            if (onStepClick && (e.key === "Enter" || e.key === " ")) {
-              e.preventDefault();
-              onStepClick("trailer");
-            }
-          }}
-          aria-label={onStepClick ? "Go to Trailer step" : undefined}
-        >
-          <span className="step-dot" />
-          <span className="step-label">Trailer</span>
         </div>
       </section>
 
@@ -802,6 +862,26 @@ const SchedulePage = (props: SchedulePageProps = {}) => {
                   </button>
                 </div>
               ))}
+              {shipments.length > 0 && (
+                <div style={{ 
+                  padding: "16px", 
+                  textAlign: "center", 
+                  background: "#F5F5F5"
+                }}>
+                  <span
+                    onClick={props.onTermsClick}
+                    style={{
+                      color: "var(--color-text-brand-primary)",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                      fontSize: "14px",
+                      fontWeight: 400
+                    }}
+                  >
+                    Appointment Guidelines
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -910,45 +990,30 @@ const SchedulePage = (props: SchedulePageProps = {}) => {
                 </div>
 
                 <div className="field-group">
-                  <label className="field-label" htmlFor="duration">
-                    Duration
+                  <label className="field-label" htmlFor="carrier">
+                    Carrier
                   </label>
-                  <Dropdown value={duration} options={durationOptions} onChange={setDuration} />
+                  <Dropdown 
+                    value={selectedCarrier} 
+                    options={carrierOptions} 
+                    onChange={setSelectedCarrier}
+                    placeholder="Select a carrier from the list"
+                    typeAhead={true}
+                  />
                 </div>
 
                 <div className="field-group">
                   <label className="field-label" htmlFor="question-1">
-                    Question 1
+                    What is the freight service type?
                   </label>
-                  <Dropdown value={question1} options={questionOptions} placeholder="Select answer from list" onChange={setQuestion1} />
+                  <Dropdown value={question1} options={freightServiceTypeOptions} placeholder="Select answer from list" onChange={setQuestion1} />
                 </div>
 
                 <div className="field-group">
                   <label className="field-label" htmlFor="question-2">
-                    Question 2
+                    What are the storage considerations?
                   </label>
-                  <Dropdown value={question2} options={questionOptions} placeholder="Select answer from list" onChange={setQuestion2} />
-                </div>
-
-                <div className="field-group">
-                  <label className="field-label" htmlFor="question-3">
-                    Question 3
-                  </label>
-                  <Dropdown value={question3} options={questionOptions} placeholder="Select answer from list" onChange={setQuestion3} />
-                </div>
-
-                <div className="field-group">
-                  <label className="field-label" htmlFor="question-4">
-                    Question 4
-                  </label>
-                  <Dropdown value={question4} options={questionOptions} placeholder="Select answer from list" onChange={setQuestion4} />
-                </div>
-
-                <div className="field-group">
-                  <label className="field-label" htmlFor="question-5">
-                    Question 5
-                  </label>
-                  <Dropdown value={question5} options={questionOptions} placeholder="Select answer from list" onChange={setQuestion5} />
+                  <Dropdown value={question2} options={storageConsiderationOptions} placeholder="Select answer from list" onChange={setQuestion2} />
                 </div>
               </div>
             </div>
@@ -958,7 +1023,7 @@ const SchedulePage = (props: SchedulePageProps = {}) => {
 
       <div className="action-bar">
         <div className="footer-actions">
-          <button className="secondary" type="button">
+          <button className="secondary" type="button" onClick={onCancel}>
             Cancel
           </button>
           <button 
@@ -981,6 +1046,12 @@ const SchedulePage = (props: SchedulePageProps = {}) => {
           <span>Contact</span>
           <span>Customer Support</span>
           <span>Products</span>
+          <span 
+            style={{ cursor: "pointer" }}
+            onClick={props.onTermsClick}
+          >
+            Terms and Conditions
+          </span>
         </div>
         <div className="footer-copyright">
           © 2026 Chamberlain Group. All Rights Reserved

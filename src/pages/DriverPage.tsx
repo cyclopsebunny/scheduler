@@ -19,7 +19,7 @@ type Shipment = {
 
 const RESIZER_WIDTH = 18;
 const MIN_DETAILS_WIDTH = 320;
-const MIN_SHIPMENTS_WIDTH = 360;
+const MIN_SHIPMENTS_WIDTH = 450; // Must match CSS min-width: 450px
 
 const useOverflowState = (ref: RefObject<HTMLElement>) => {
   const [hasOverflow, setHasOverflow] = useState(false);
@@ -65,9 +65,6 @@ type DriverPageProps = {
   questionAnswers?: {
     question1: string;
     question2: string;
-    question3: string;
-    question4: string;
-    question5: string;
   };
   shipments?: Shipment[];
   duration?: string;
@@ -79,6 +76,8 @@ type DriverPageProps = {
   onMobileNumberChange?: (number: string) => void;
   selectedCarrier?: string;
   trailerNumber?: string;
+  onCancel?: () => void;
+  onTermsClick?: () => void;
 };
 
 export const DriverPage = ({
@@ -100,6 +99,8 @@ export const DriverPage = ({
   onMobileNumberChange,
   selectedCarrier = "",
   trailerNumber = "",
+  onCancel,
+  onTermsClick,
 }: DriverPageProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const detailsScrollRef = useRef<HTMLDivElement>(null);
@@ -116,10 +117,7 @@ export const DriverPage = ({
   // Check if there are any tags to display
   const hasTags = questionAnswers && (
     questionAnswers.question1 ||
-    questionAnswers.question2 ||
-    questionAnswers.question3 ||
-    questionAnswers.question4 ||
-    questionAnswers.question5
+    questionAnswers.question2
   );
 
   // Find primary shipment ID and count additional shipments
@@ -156,7 +154,7 @@ export const DriverPage = ({
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
-    return `CBI-${year}${month}${day}-001`;
+    return `MYQ-${year}${month}${day}-001`;
   };
 
   const confirmationNumber = selectedDate && selectedTime 
@@ -246,7 +244,11 @@ export const DriverPage = ({
         return;
       }
       const delta = event.clientX - resizeStateRef.current.startX;
-      const maxWidth = contentWidth - MIN_SHIPMENTS_WIDTH - RESIZER_WIDTH;
+      // Calculate available width: content width minus shipments min-width, resizer, and any gap
+      // Get computed gap from content element (defaults to 0 if not set)
+      const contentElement = contentRef.current;
+      const computedGap = contentElement ? parseFloat(getComputedStyle(contentElement).gap) || 0 : 0;
+      const maxWidth = contentWidth - MIN_SHIPMENTS_WIDTH - RESIZER_WIDTH - computedGap;
       const nextWidth = Math.min(
         Math.max(MIN_DETAILS_WIDTH, resizeStateRef.current.startWidth - delta),
         Math.max(MIN_DETAILS_WIDTH, maxWidth)
@@ -413,15 +415,6 @@ export const DriverPage = ({
                       {questionAnswers?.question2 && (
                         <span className="details-tag">{questionAnswers.question2}</span>
                       )}
-                      {questionAnswers?.question3 && (
-                        <span className="details-tag">{questionAnswers.question3}</span>
-                      )}
-                      {questionAnswers?.question4 && (
-                        <span className="details-tag">{questionAnswers.question4}</span>
-                      )}
-                      {questionAnswers?.question5 && (
-                        <span className="details-tag">{questionAnswers.question5}</span>
-                      )}
                     </div>
                   </div>
                 )}
@@ -486,27 +479,7 @@ export const DriverPage = ({
                   <div className="details-info-row">
                     <span className="details-info-label">Trailer #:</span>
                     <span className="details-info-value">
-                      {trailerNumber || "--"}
-                    </span>
-                  </div>
-                  <div className="details-info-row">
-                    <span className="details-info-label">Driver:</span>
-                    <span 
-                      className="details-info-value"
-                      style={(firstName || lastName) ? { color: 'var(--color-text-brand-primary)' } : undefined}
-                    >
-                      {(firstName || lastName) 
-                        ? `${firstName} ${lastName}`.trim() || "--"
-                        : "--"}
-                    </span>
-                  </div>
-                  <div className="details-info-row">
-                    <span className="details-info-label">Mobile:</span>
-                    <span 
-                      className="details-info-value"
-                      style={phoneNumber ? { color: 'var(--color-text-brand-primary)' } : undefined}
-                    >
-                      {phoneNumber || "--"}
+                      {"--"}
                     </span>
                   </div>
                 </div>
@@ -529,7 +502,7 @@ export const DriverPage = ({
           >
             Skip
           </button>
-          <button className="secondary" type="button">
+          <button className="secondary" type="button" onClick={onCancel}>
             Cancel
           </button>
           <button 
@@ -552,6 +525,12 @@ export const DriverPage = ({
           <span>Contact</span>
           <span>Customer Support</span>
           <span>Products</span>
+          <span 
+            style={{ cursor: "pointer" }}
+            onClick={onTermsClick}
+          >
+            Terms and Conditions
+          </span>
         </div>
         <div className="footer-copyright">
           © 2026 Chamberlain Group. All Rights Reserved

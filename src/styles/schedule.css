@@ -4,6 +4,7 @@
   flex-direction: column;
   gap: 16px;
   background: var(--color-bg-default-secondary);
+  background-color: rgba(247, 247, 247, 1);
   padding: 16px 24px 16px;
   overflow: hidden;
 }
@@ -14,6 +15,8 @@
   justify-content: space-between;
   gap: 16px;
   padding-bottom: 8px;
+  position: relative;
+  z-index: 100;
 }
 
 .brand {
@@ -22,6 +25,7 @@
   gap: 12px;
   font-weight: 600;
   color: var(--color-text-default-primary);
+  width: 300px;
 }
 
 .brand-logo {
@@ -53,8 +57,29 @@
 }
 
 .site-selector .dropdown-toggle {
-  border: 1px solid rgba(234, 234, 234, 1);
+  border: 1px solid var(--color-border-input);
   box-shadow: none;
+}
+
+.date-selector {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  max-width: 400px;
+}
+
+.date-selector .date-dropdown-button {
+  width: 100%;
+  min-width: 280px;
+}
+
+.date-dropdown-button {
+  transition: background-color 0.15s ease;
+}
+
+.date-dropdown-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .caret {
@@ -66,9 +91,11 @@
 .user {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
   font-size: 14px;
   color: var(--color-text-default-secondary);
+  width: 300px;
 }
 
 .avatar {
@@ -97,7 +124,7 @@
   left: 50%;
   top: 22.5px;
   transform: translateX(-50%);
-  width: 423px;
+  width: 141px;
   height: 3px;
   background: #babfcc;
   z-index: 0;
@@ -154,6 +181,14 @@
   display: flex;
   flex: 1;
   min-height: 0;
+  transition: gap 0.3s ease-out;
+  align-items: stretch;
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  transition: grid-template-columns 0.3s ease-out;
 }
 
 .panel {
@@ -162,6 +197,8 @@
   border: 1px solid #efefef;
   padding: 8px;
   box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.1);
+  gap: 10px;
+  width: 100%;
 }
 
 .shipments-panel {
@@ -173,7 +210,7 @@
   min-height: 0;
   overflow: hidden;
   flex: 1;
-  min-width: 0;
+  min-width: 450px;
 }
 
 .details-panel {
@@ -187,6 +224,58 @@
   min-height: 0;
   overflow: hidden;
   flex: 0 0 auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Dashboard-specific side panel animation styles */
+.dashboard-content .details-panel {
+  width: 433px;
+  min-width: 433px;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.dashboard-content .details-panel.opening {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.dashboard-content .details-panel.closing {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.filter-icon-button {
+  background: rgba(255, 255, 255, 1);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.filter-icon-button:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
 .panel-resize-handle {
@@ -225,6 +314,49 @@
   margin-bottom: 8px;
 }
 
+/* Remove padding from the first child div inside .panel (but not shipments-panel) */
+.panel:not(.shipments-panel) > div:first-child {
+  padding: 0px;
+}
+
+/* Parent wrapper div for date navigation container - matches element path: .panel > div[1] */
+/* This is the flex column container that wraps the date navigation */
+/* Remove padding from the parent wrapper that contains the date navigation div */
+.panel:not(.shipments-panel) > div:first-child:has(> div:has(.next-prev-buttons)) {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Wrapper div for date navigation with NextPrevButtons and DateDropdown */
+/* Target div that contains .next-prev-buttons to avoid affecting panel-header */
+/* This selector targets any div inside panel that contains next-prev-buttons, excluding panel-header and date-navigation-container */
+.panel:not(.shipments-panel) > div:not(.panel-header):has(.next-prev-buttons):not(.date-navigation-container),
+.panel:not(.shipments-panel) > div > div:has(.next-prev-buttons):not(.date-navigation-container) {
+  padding: 0px !important;
+  background-color: var(--color-bg-default-secondary) !important;
+  border-radius: 16px 16px 8px 8px !important;
+  border-top-left-radius: 16px !important;
+  border-top-right-radius: 16px !important;
+  gap: 0px !important;
+  justify-content: space-between !important;
+  width: 100%;
+}
+
+/* Override padding for date navigation div that contains NextPrevButtons, DateDropdown, and Today button */
+/* More specific selector to override the above rule - only applies to dashboard panel, not shipments panel */
+.panel:not(.shipments-panel) .date-navigation-container {
+  height: fit-content;
+  width: 100%;
+  padding: 8px !important;
+  box-sizing: border-box !important;
+  gap: 0px !important;
+  justify-content: space-between !important;
+}
+
 .panel-title-bar {
   display: flex;
   height: 32px;
@@ -252,6 +384,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 4px 8px;
 }
 
 .ghost-button:disabled {
@@ -262,6 +395,20 @@
 .ghost-button:disabled .plus {
   opacity: 0.6;
   filter: grayscale(100%);
+}
+
+.ghost-button:disabled img {
+  opacity: 0.6;
+  filter: grayscale(100%);
+}
+
+.ghost-button img {
+  filter: brightness(0) saturate(100%) invert(38%) sepia(95%) saturate(2476%) hue-rotate(195deg) brightness(98%) contrast(91%);
+}
+
+.ghost-button.active {
+  background-color: #E3F2FD;
+  border-radius: 4px;
 }
 
 .plus {
@@ -275,8 +422,9 @@
   top: calc(100% + 8px);
   right: 0;
   background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-200);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
   padding: 16px;
   min-width: 280px;
   z-index: 1000;
@@ -352,7 +500,8 @@
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  row-gap: 4px;
+  column-gap: 0;
 }
 
 .calendar-day-empty {
@@ -373,6 +522,10 @@
   transition: all 0.15s ease;
   min-width: 32px;
   min-height: 32px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
 }
 
 .calendar-day:hover:not(.disabled) {
@@ -382,6 +535,34 @@
 .calendar-day.selected {
   background-color: var(--color-text-brand-primary);
   color: #ffffff;
+  position: relative;
+  z-index: 2;
+}
+
+/* When selected and in-range, show range background behind the circle */
+.calendar-day.selected.in-range {
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #ffffff;
+  position: relative;
+}
+
+/* Use pseudo-element for the selected circle so range background shows behind it */
+.calendar-day.selected.in-range::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-text-brand-primary);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.calendar-day.selected.in-range > * {
+  position: relative;
+  z-index: 2;
 }
 
 .calendar-day.today {
@@ -392,6 +573,39 @@
 .calendar-day.disabled {
   color: rgba(186, 191, 204, 1);
   cursor: not-allowed;
+}
+
+.calendar-day.in-range {
+  position: relative;
+  color: var(--color-text-default-primary);
+  border-radius: 0;
+  width: 100%;
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.calendar-day.in-range:hover:not(.disabled) {
+  background-color: rgba(0, 123, 255, 0.2);
+}
+
+.calendar-day.selected.in-range:hover:not(.disabled) {
+  background-color: rgba(0, 123, 255, 0.2);
+}
+
+.calendar-day.range-start {
+  border-top-left-radius: 50% !important;
+  border-bottom-left-radius: 50% !important;
+}
+
+.calendar-day.range-end {
+  border-top-right-radius: 50% !important;
+  border-bottom-right-radius: 50% !important;
+}
+
+
+
+/* When start and end are the same date */
+.calendar-day.range-start.range-end {
+  border-radius: 50%;
 }
 
 .driver-info-content {
@@ -490,12 +704,11 @@
 }
 
 .table {
-  position: relative;
   display: flex;
   flex-direction: column;
   gap: 16px;
   --table-columns: 32px minmax(180px, 1.4fr) minmax(140px, 1fr) minmax(140px, 1fr)
-    minmax(90px, 0.6fr) minmax(90px, 0.7fr) minmax(90px, 0.6fr) 32px;
+    minmax(90px, 0.6fr) minmax(90px, 0.7fr) minmax(90px, 0.6fr) 1fr;
 }
 
 .shipments-panel .table {
@@ -505,22 +718,23 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  gap: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .table-scroll {
-  display: grid;
-  grid-template-columns: var(--table-columns);
-  grid-auto-rows: min-content;
-  column-gap: 0;
-  row-gap: 8px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   height: 100%;
   overflow-y: auto;
   overflow-x: auto;
-  padding: 16px 8px;
+  padding: 0;
   background: #f5f5f5;
-  position: relative;
-  z-index: 1;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 .table-gradient {
@@ -568,30 +782,314 @@
 }
 
 .table-header {
-  display: contents;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  border-bottom: 1px solid #C7C9CB;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: #F5F5F5;
 }
 
 .table-header > span {
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 400;
   color: var(--color-text-default-secondary);
-  padding: 8px 10px 0px 10px;
+  padding: 8px 10px;
   box-sizing: border-box;
   border: 1px solid transparent;
-  align-self: start;
+  background-color: #F5F5F5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  min-height: 32px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Status column header should have font-weight 600 */
+.table-header > span:first-child {
+  font-weight: 600;
+}
+
+.table-header > span > * {
+  text-align: left;
+}
+
+.table-header > span:last-child {
+  justify-content: flex-end;
+  flex: 1 1 0;
+}
+
+/* Remove shadow from table actions column - specific to dashboard table only */
+.table-scroll .table-actions-column {
+  box-shadow: none;
+  border-width: 0px;
+  border-style: none;
+  border-image: none;
+}
+
+/* Add gradient fade on left edge of action button column - only on table rows, not header */
+.table-scroll > .table-row > .table-actions-column {
+  position: relative;
+  border-width: 0px;
+  border-style: none;
+  border-image: none;
+  isolation: isolate;
+}
+
+.table-scroll > .table-row > .table-actions-column::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Ensure button content is above the gradient overlay */
+.table-scroll > .table-row > .table-actions-column > button {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+}
+
+/* Remove ::before gradient overlays - using span background gradient instead */
+.table-scroll > .table-row > .table-actions-column::before {
+  display: none;
+}
+
+/* Selected row highlighting - must override alternating row colors */
+.table-scroll > .table-row.table-row-selected,
+.table-scroll > .table-row.table-row-selected:nth-child(even),
+.table-scroll > .table-row.table-row-selected:nth-child(2n+1) {
+  background-color: #E3F2FD !important;
+}
+
+.table-scroll > .table-row.table-row-selected:hover,
+.table-scroll > .table-row.table-row-selected:nth-child(even):hover,
+.table-scroll > .table-row.table-row-selected:nth-child(2n+1):hover {
+  background-color: #BBDEFB !important;
+}
+
+/* Apply selected row hover state to action button column */
+.table-scroll > .table-row.table-row-selected:hover .table-actions-column,
+.table-scroll > .table-row.table-row-selected:nth-child(even):hover .table-actions-column,
+.table-scroll > .table-row.table-row-selected:nth-child(2n+1):hover .table-actions-column {
+  background: linear-gradient(90deg, rgba(187, 222, 251, 0) 0%, rgba(187, 222, 251, 0) 5%, rgba(187, 222, 251, 0.3) 8%, rgba(187, 222, 251, 1) 15%) !important;
 }
 
 .table-row {
-  display: contents;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+/* Alternating row backgrounds: first row (after header) is grey, then white, grey, white... */
+/* Even children (2, 4, 6, 8...) = grey */
+.table-scroll > .table-row:nth-child(even):not(.table-row-selected) {
+  background-color: #F5F5F5 !important;
+}
+
+/* Odd children starting from 3 (3, 5, 7, 9...) = white */
+.table-scroll > .table-row:nth-child(2n+1):not(.table-row-selected) {
+  background-color: #FFFFFF !important;
+}
+
+/* Hover states for non-selected rows */
+.table-scroll > .table-row:nth-child(even):not(.table-row-selected):hover {
+  background-color: #F0F0F0 !important;
+  cursor: pointer;
+}
+
+/* White row hover should be lighter than gray row background (#F5F5F5) */
+.table-scroll > .table-row:nth-child(2n+1):not(.table-row-selected):hover {
+  background-color: #FAFAFA !important;
+  cursor: pointer;
+}
+
+/* Apply hover state to action button column for gray rows */
+.table-scroll > .table-row:nth-child(even):not(.table-row-selected):hover .table-actions-column {
+  background: linear-gradient(90deg, rgba(240, 240, 240, 0) 0%, rgba(240, 240, 240, 0) 5%, rgba(240, 240, 240, 0.3) 8%, rgba(240, 240, 240, 1) 15%) !important;
+}
+
+/* Apply hover state to action button column for white rows */
+.table-scroll > .table-row:nth-child(2n+1):not(.table-row-selected):hover .table-actions-column {
+  background: linear-gradient(90deg, rgba(250, 250, 250, 0) 0%, rgba(250, 250, 250, 0) 5%, rgba(250, 250, 250, 0.3) 8%, rgba(250, 250, 250, 1) 15%) !important;
+}
+
+/* Remove background colors from shipments panel table rows - override with higher specificity */
+.shipments-panel .table-scroll > .table-row:nth-child(even) {
+  background-color: transparent !important;
+}
+
+.shipments-panel .table-scroll > .table-row:nth-child(2n+1) {
+  background-color: transparent !important;
+}
+
+/* Add 8px spacing between rows in shipments table */
+.shipments-panel .table-scroll {
+  gap: 8px;
 }
 
 .table-row > * {
   min-width: 0;
   box-sizing: border-box;
-  align-self: start;
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.table-row > * > * {
+  text-align: left;
+}
+
+.table-row > span {
+  font-size: 12px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.table-row > span > * {
+  text-align: left;
+}
+
+/* Target spans with two rows of text (flex-direction: column) */
+.table-header > span[style*="flex-direction: column"],
+.table-header > span[style*="flexDirection: column"],
+.table-row > span[style*="flex-direction: column"],
+.table-row > span[style*="flexDirection: column"] {
+  align-items: flex-start !important;
+  justify-content: center !important;
+}
+
+.table-row > span:last-child {
+  justify-content: flex-end;
+  flex: 1 1 0;
+}
+
+.table-row > div {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.table-row > .icon-button:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 32px;
+  width: 32px;
+  min-width: 32px;
+}
+
+.table-row > .icon-button:last-child {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex: 1 1 0;
+}
+
+/* Reduce trash can button cell width in shipments table to fit icon */
+.shipments-panel .table-row > .icon-button:last-child {
+  flex: 0 0 34px;
+  width: 34px;
+  min-width: 34px;
+  max-width: 34px;
+}
+
+/* Match header cell width to row cell width for shipments panel trash can column */
+.shipments-panel .table-header > span:last-child {
+  flex: 0 0 34px;
+  width: 34px;
+  min-width: 34px;
+  max-width: 34px;
 }
 
 .table-row > .icon-button {
-  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.table-header > span:first-child:empty {
+  flex: 0 0 32px;
+  width: 32px;
+  min-width: 32px;
+}
+
+/* Table Status Indicator */
+.table-status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #10405A;
+  padding: 4px !important;
+  align-self: stretch;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.table-status > * {
+  text-align: left;
+}
+
+.table-status-bar {
+  width: 4px;
+  height: 100%;
+  background-color: #10405A;
+  flex-shrink: 0;
+  border-radius: 9999px;
+}
+
+.table-status.status-scheduled {
+  color: #10405A;
+}
+
+.table-status.status-scheduled .table-status-bar {
+  background-color: #10405A;
+}
+
+.table-status.status-in-progress {
+  color: #43ac1d;
+}
+
+.table-status.status-in-progress .table-status-bar {
+  background-color: #43ac1d;
+}
+
+.table-status.status-complete {
+  color: #9E9E9E;
+}
+
+.table-status.status-complete .table-status-bar {
+  background-color: #9E9E9E;
+}
+
+.table-status.status-cancelled {
+  color: #d13b0b;
+}
+
+.table-status.status-cancelled .table-status-bar {
+  background-color: #d13b0b;
 }
 
 .input {
@@ -631,12 +1129,60 @@
   color: var(--color-text-default-primary);
 }
 
+.search-input-borderless {
+  border: none !important;
+  background: transparent !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-input-borderless::placeholder {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-input-borderless:focus,
+.search-input-borderless:focus-visible {
+  border: none !important;
+  outline: none !important;
+}
+
 .table-row > .input {
   border-radius: 0;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.table-row > .dropdown {
+  width: 100%;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  align-self: stretch;
 }
 
 .table-row > .dropdown .dropdown-toggle {
   border-radius: 0;
+  width: 100%;
+  padding: 4px 10px;
+  gap: 8px;
+  justify-content: space-between;
+  height: 100%;
+  min-height: 0;
+}
+
+.table-row > .dropdown .dropdown-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-row > .dropdown .dropdown-chevron {
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 
 .table-row > .input + .input {
@@ -667,14 +1213,17 @@
 }
 
 .dropdown-toggle {
-  width: 100%;
+  width: fit-content;
   text-align: left;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding-left: 16px;
-  padding-right: 36px;
+  padding: 8px 16px;
   gap: 16px;
+  transition: background-color 0.15s ease;
+}
+
+.dropdown-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .dropdown-icon {
@@ -684,27 +1233,28 @@
   flex-shrink: 0;
 }
 
-.dropdown-toggle::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  width: 16px;
-  height: 16px;
-  background: url("../assets/chevron-down.svg") no-repeat center / contain;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-.dropdown.open .dropdown-toggle::after {
-  transform: translateY(-50%) rotate(180deg);
+/* Make calendar icon in DateDropdown black */
+.date-dropdown-button .dropdown-icon {
+  filter: brightness(0) saturate(100%);
 }
 
 .dropdown-value {
-  display: block;
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.dropdown-chevron {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.dropdown-toggle.open .dropdown-chevron {
+  transform: rotate(180deg);
 }
 
 .dropdown-toggle.placeholder .dropdown-value {
@@ -716,7 +1266,7 @@
   left: 0;
   right: 0;
   top: calc(100% + 4px);
-  z-index: 10;
+  z-index: 1000;
   background: #ffffff;
   border: 1px solid var(--color-border-input);
   border-radius: var(--radius-200);
@@ -728,6 +1278,15 @@
   max-height: 400px;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+/* Right-align dropdown menu for DateRangeSelector */
+.date-range-dropdown-container .dropdown-menu,
+.date-range-dropdown-menu {
+  left: auto !important;
+  right: 0 !important;
+  min-width: 160px;
+  max-width: 200px;
 }
 
 .dropdown-option {
@@ -865,6 +1424,18 @@
   gap: 8px;
   padding-bottom: 8px;
   margin-bottom: 16px;
+}
+
+.field-group .dropdown {
+  width: 100%;
+}
+
+.field-group .dropdown .dropdown-toggle {
+  width: 100% !important;
+}
+
+.field-group .dropdown .input.dropdown-toggle {
+  width: 100% !important;
 }
 
 .field-label {
@@ -1075,6 +1646,268 @@ button.secondary {
   color: var(--color-text-default-secondary);
 }
 
+button.secondary:disabled {
+  background: var(--color-bg-default-primary);
+  color: #cccccc;
+  border-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-bg-default-primary);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-200);
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-right: 12px;
+  padding-left: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  height: 100%;
+}
+
+.filter-button:hover {
+  background: #c7e3f2;
+  border-color: #003b5c;
+}
+
+.filter-button.active,
+.filter-button:active {
+  background: #003b5c;
+  border-color: #003b5c;
+}
+
+.filter-button.active .filter-button-label,
+.filter-button:active .filter-button-label {
+  color: #ffffff;
+}
+
+.filter-button.active .filter-button-count,
+.filter-button:active .filter-button-count {
+  color: #ffffff;
+}
+
+.filter-button.active:hover .filter-button-indicator,
+.filter-button:active:hover .filter-button-indicator {
+  background: #0078ab;
+}
+
+.filter-button-indicator {
+  width: 6px;
+  background: #003b5c;
+  border-radius: 30px;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+/* Scheduled status (default - already defined above) */
+.filter-button.status-scheduled .filter-button-indicator {
+  background: #003b5c;
+}
+
+.filter-button.status-scheduled .filter-button-label,
+.filter-button.status-scheduled .filter-button-count {
+  color: #003b5c;
+}
+
+.filter-button.status-scheduled:hover {
+  background: #c7e3f2;
+  border-color: #003b5c;
+}
+
+.filter-button.status-scheduled.active,
+.filter-button.status-scheduled:active {
+  background: #003b5c;
+  border-color: #003b5c;
+}
+
+.filter-button.status-scheduled.active .filter-button-label,
+.filter-button.status-scheduled.active .filter-button-count,
+.filter-button.status-scheduled:active .filter-button-label,
+.filter-button.status-scheduled:active .filter-button-count {
+  color: #ffffff;
+}
+
+.filter-button.status-scheduled.active:hover .filter-button-indicator,
+.filter-button.status-scheduled:active:hover .filter-button-indicator {
+  background: #0078ab;
+}
+
+/* In Progress status */
+.filter-button.status-in-progress .filter-button-indicator {
+  background: #43ac1d;
+}
+
+.filter-button.status-in-progress .filter-button-label,
+.filter-button.status-in-progress .filter-button-count {
+  color: #348516;
+}
+
+.filter-button.status-in-progress:hover {
+  background: #e8f5e9;
+  border-color: #43ac1d;
+}
+
+.filter-button.status-in-progress.active,
+.filter-button.status-in-progress:active {
+  background: #43ac1d;
+  border-color: #43ac1d;
+}
+
+.filter-button.status-in-progress.active .filter-button-label,
+.filter-button.status-in-progress.active .filter-button-count,
+.filter-button.status-in-progress:active .filter-button-label,
+.filter-button.status-in-progress:active .filter-button-count {
+  color: #ffffff;
+}
+
+.filter-button.status-in-progress.active:hover .filter-button-indicator,
+.filter-button.status-in-progress:active:hover .filter-button-indicator {
+  background: #5bc82a;
+}
+
+/* Complete status */
+.filter-button.status-complete .filter-button-indicator {
+  background: #909090;
+}
+
+.filter-button.status-complete .filter-button-label,
+.filter-button.status-complete .filter-button-count {
+  color: #6b6b6b;
+}
+
+.filter-button.status-complete:hover {
+  background: #f5f5f5;
+  border-color: #909090;
+}
+
+.filter-button.status-complete.active,
+.filter-button.status-complete:active {
+  background: #909090;
+  border-color: #909090;
+}
+
+.filter-button.status-complete.active .filter-button-label,
+.filter-button.status-complete.active .filter-button-count,
+.filter-button.status-complete:active .filter-button-label,
+.filter-button.status-complete:active .filter-button-count {
+  color: #ffffff;
+}
+
+.filter-button.status-complete.active:hover .filter-button-indicator,
+.filter-button.status-complete:active:hover .filter-button-indicator {
+  background: #a8a8a8;
+}
+
+/* Cancelled status */
+.filter-button.status-cancelled .filter-button-indicator {
+  background: #d13b0b;
+}
+
+.filter-button.status-cancelled .filter-button-label {
+  color: #9e2d08;
+}
+
+.filter-button.status-cancelled .filter-button-count {
+  color: #d13b0b;
+}
+
+.filter-button.status-cancelled:hover {
+  background: #ffebee;
+  border-color: #d13b0b;
+}
+
+.filter-button.status-cancelled.active,
+.filter-button.status-cancelled:active {
+  background: #d13b0b;
+  border-color: #d13b0b;
+}
+
+.filter-button.status-cancelled.active .filter-button-label,
+.filter-button.status-cancelled.active .filter-button-count,
+.filter-button.status-cancelled:active .filter-button-label,
+.filter-button.status-cancelled:active .filter-button-count {
+  color: #ffffff;
+}
+
+.filter-button.status-cancelled.active:hover .filter-button-indicator,
+.filter-button.status-cancelled:active:hover .filter-button-indicator {
+  background: #e85a2b;
+}
+
+/* Search Type Selector */
+.search-type-selector-wrapper {
+  padding-right: 0;
+}
+
+.search-type-selector-wrapper .dropdown {
+  width: auto;
+}
+
+.search-type-selector-wrapper .dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 16px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text-brand-primary);
+  font-weight: 400;
+  line-height: 1.4;
+  box-shadow: none;
+  width: auto;
+  min-width: auto;
+  justify-content: center;
+}
+
+.search-type-selector-wrapper .dropdown-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-left: 0;
+}
+
+.search-type-selector-wrapper .dropdown-value {
+  color: var(--color-text-brand-primary);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.search-type-selector-wrapper .dropdown-chevron {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-left: 0;
+}
+
+.filter-button-label {
+  flex: 1 0 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 15px;
+  color: #003b5c;
+  text-align: center;
+  min-width: 0;
+}
+
+.filter-button-count {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 24px;
+  color: #003b5c;
+  flex-shrink: 0;
+}
+
 button.skip-button {
   border: none;
   background: transparent;
@@ -1093,10 +1926,13 @@ button.skip-button {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  background-color: rgba(245, 245, 245, 1);
+  background-color: var(--color-bg-default-tertiary);
   border: 1px solid rgba(204, 204, 204, 1);
   border-radius: 8px;
   color: rgba(23, 25, 28, 1);
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0px;
 }
 
 .appointment-time-selector-title {
@@ -1107,7 +1943,7 @@ button.skip-button {
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  margin: 0 0 16px 0;
+  margin: 0 0 4px 0;
   text-align: center;
 }
 
@@ -1120,6 +1956,7 @@ button.skip-button {
   max-height: 100%;
   overflow: hidden;
   width: 100%;
+  background-color: var(--color-bg-default-secondary);
 }
 
 .appointment-nav-button {
@@ -1166,6 +2003,9 @@ button.skip-button {
   padding-left: 16px;
   padding-right: 16px;
   width: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-bg-default-tertiary);
 }
 
 .appointment-date-column-header {
@@ -1243,11 +2083,11 @@ button.skip-button {
 
 .appointment-time-slot {
   background: #ffffff;
-  border: 1px solid #003B5C;
+  border: 1px solid var(--color-border-input);
   border-radius: 8px;
   padding: 10px 16px;
   font-size: 14px;
-  color: #003B5C;
+  color: var(--color-text-default-secondary);
   cursor: pointer;
   text-align: center;
   transition: all 0.15s ease;
@@ -1364,7 +2204,7 @@ button.skip-button {
 }
 
 .confirmation-section p {
-  margin: 8px 0;
+  margin: 8px 0 4px 0;
   font-size: 18px;
   color: var(--color-text-default-primary);
   line-height: 1.5;
@@ -1386,10 +2226,11 @@ button.skip-button {
   font-size: 14px;
   color: var(--color-text-default-primary);
   line-height: 1.6;
+  text-align: center;
 }
 
 .important-info-section p {
-  margin: 12px 0;
+  margin: 4px 0 12px 0;
   line-height: 17px;
 }
 
@@ -1433,6 +2274,17 @@ button.skip-button {
 
 .modal-footer .primary {
   min-width: 100px;
+}
+
+.cancel-appointment-button {
+  background: #F44336 !important;
+  color: #ffffff !important;
+  border-color: #F44336 !important;
+}
+
+.cancel-appointment-button:hover {
+  background: #D32F2F !important;
+  border-color: #D32F2F !important;
 }
 
 @media (max-width: 1100px) {

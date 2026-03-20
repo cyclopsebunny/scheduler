@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import chevronDown from "../assets/chevron-down.svg";
 
 type DropdownProps = {
   value: string;
@@ -7,9 +8,10 @@ type DropdownProps = {
   icon?: string;
   placeholder?: string;
   typeAhead?: boolean;
+  chevronIcon?: string;
 };
 
-export const Dropdown = ({ value, options, onChange, icon, placeholder, typeAhead = false }: DropdownProps) => {
+export const Dropdown = ({ value, options, onChange, icon, placeholder, typeAhead = false, chevronIcon }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [inputValue, setInputValue] = useState(value || "");
@@ -178,7 +180,7 @@ export const Dropdown = ({ value, options, onChange, icon, placeholder, typeAhea
         </div>
       ) : (
         <button
-          className={`input dropdown-toggle ${isPlaceholder ? "placeholder" : ""}`}
+          className={`input dropdown-toggle ${isPlaceholder ? "placeholder" : ""} ${isOpen ? "open" : ""}`}
           type="button"
           aria-haspopup="listbox"
           aria-expanded={isOpen}
@@ -186,6 +188,7 @@ export const Dropdown = ({ value, options, onChange, icon, placeholder, typeAhea
         >
           {icon && <img className="dropdown-icon" src={icon} alt="" aria-hidden="true" />}
           <span className="dropdown-value">{displayValue}</span>
+          <img className="dropdown-chevron" src={chevronIcon || chevronDown} alt="" aria-hidden="true" />
         </button>
       )}
       {isOpen && typeAhead && filteredOptions.length === 0 && inputValue && (

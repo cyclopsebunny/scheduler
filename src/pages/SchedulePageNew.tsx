@@ -11,7 +11,7 @@ import chevronDown from "../assets/chevron-down.svg";
 
 const RESIZER_WIDTH = 18;
 const MIN_DETAILS_WIDTH = 320;
-const MIN_SHIPMENTS_WIDTH = 360;
+const MIN_SHIPMENTS_WIDTH = 450; // Must match CSS min-width: 450px
 
 type Shipment = {
   rowId: string;
@@ -28,27 +28,28 @@ type SchedulePageNewProps = {
   selectedSite: string;
   onSiteChange: (site: string) => void;
   siteOptions: string[];
-  onStepClick: (step: "shipment" | "schedule" | "driver" | "trailer") => void;
+  onStepClick: (step: "shipment" | "schedule") => void;
   shipmentType?: "Inbound" | "Outbound";
   loadType?: string;
   productType?: "Standard" | "Non Standard";
   questionAnswers?: {
     question1: string;
     question2: string;
-    question3: string;
-    question4: string;
-    question5: string;
   };
   shipments?: Shipment[];
   duration?: string;
   selectedDate?: Date | null;
   selectedTime?: string | null;
+  originalScheduledTime?: string | null; // Original time when rescheduling/editing - should always be available
   onSelectedDateChange?: (date: Date | null) => void;
   onSelectedTimeChange?: (time: string | null) => void;
   driverName?: string;
   mobileNumber?: string;
   selectedCarrier?: string;
   trailerNumber?: string;
+  onCancel?: () => void;
+  onComplete?: () => void;
+  onTermsClick?: () => void;
 };
 
 const useOverflowState = (ref: RefObject<HTMLElement>) => {
@@ -97,12 +98,16 @@ export const SchedulePageNew = ({
   duration = "1 hour",
   selectedDate: propSelectedDate,
   selectedTime: propSelectedTime,
+  originalScheduledTime,
   onSelectedDateChange,
   onSelectedTimeChange,
   driverName = "",
   mobileNumber = "",
   selectedCarrier = "",
   trailerNumber = "",
+  onCancel,
+  onComplete,
+  onTermsClick,
 }: SchedulePageNewProps) => {
   // Calculate display values
   const shipmentTypeText = shipmentType === "Inbound" ? "IB" : "OB";
@@ -112,10 +117,7 @@ export const SchedulePageNew = ({
   // Check if there are any tags to display
   const hasTags = questionAnswers && (
     questionAnswers.question1 ||
-    questionAnswers.question2 ||
-    questionAnswers.question3 ||
-    questionAnswers.question4 ||
-    questionAnswers.question5
+    questionAnswers.question2
   );
 
   // Find primary shipment ID and count additional shipments
@@ -244,7 +246,7 @@ export const SchedulePageNew = ({
   };
 
   // Generate time slots for a date (example times - in real app, these would come from API)
-  const generateTimeSlots = (date: Date): string[] => {
+  const generateTimeSlots = (date: Date, includeSelectedTime?: string, includeOriginalTime?: string): string[] => {
     const dayOfWeek = date.getDay(); // 0 = Sunday, 5 = Friday
     
     let slots: string[] = [];
@@ -277,6 +279,40 @@ export const SchedulePageNew = ({
       slots = ["9:00 AM", "10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM"];
     }
     
+    // Helper to add a time to slots if not already present
+    const addTimeIfNotPresent = (time: string) => {
+      if (time && !slots.includes(time)) {
+        slots.push(time);
+      }
+    };
+    
+    // Add original scheduled time if provided (always keep it available)
+    if (includeOriginalTime) {
+      addTimeIfNotPresent(includeOriginalTime);
+    }
+    
+    // Add selected time if provided
+    if (includeSelectedTime) {
+      addTimeIfNotPresent(includeSelectedTime);
+    }
+    
+    // Sort slots by time (convert to 24-hour for comparison, then sort)
+    if (includeOriginalTime || includeSelectedTime) {
+      slots.sort((a, b) => {
+        const parseTime = (timeStr: string): number => {
+          const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (!match) return 0;
+          let hour = parseInt(match[1]);
+          const minute = parseInt(match[2]);
+          const period = match[3].toUpperCase();
+          if (period === 'PM' && hour !== 12) hour += 12;
+          if (period === 'AM' && hour === 12) hour = 0;
+          return hour * 60 + minute;
+        };
+        return parseTime(a) - parseTime(b);
+      });
+    }
+    
     // Remove duplicates while preserving order
     return Array.from(new Set(slots));
   };
@@ -286,7 +322,7 @@ export const SchedulePageNew = ({
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
-    return `CBI-${year}${month}${day}-001`;
+    return `MYQ-${year}${month}${day}-001`;
   };
 
   const confirmationNumber = selectedDate && selectedTime 
@@ -307,6 +343,28 @@ export const SchedulePageNew = ({
   const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
   const hasDetailsOverflow = useOverflowState(detailsScrollRef);
 
+  // When a date is pre-selected (e.g., from reschedule), ensure it's visible and calendar is set correctly
+  useEffect(() => {
+    if (selectedDate) {
+      // Set calendar to selected date's month/year
+      setCalendarMonth(selectedDate.getMonth());
+      setCalendarYear(selectedDate.getFullYear());
+      
+      // Calculate offset to show the selected date in the visible range
+      const minDate = new Date();
+      minDate.setHours(0, 0, 0, 0);
+      minDate.setDate(minDate.getDate() + 1); // 24 hours from now (next day)
+      
+      const daysDiff = Math.floor((selectedDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      // Set offset to show the selected date (round down to nearest multiple of 3 to show it in first position if possible)
+      if (daysDiff >= 0) {
+        const offset = Math.max(0, daysDiff - (daysDiff % 3));
+        setCurrentDateOffset(offset);
+      }
+    }
+  }, [selectedDate]);
+
   useEffect(() => {
     if (!isResizing) {
       return;
@@ -318,7 +376,11 @@ export const SchedulePageNew = ({
         return;
       }
       const delta = event.clientX - resizeStateRef.current.startX;
-      const maxWidth = contentWidth - MIN_SHIPMENTS_WIDTH - RESIZER_WIDTH;
+      // Calculate available width: content width minus shipments min-width, resizer, and any gap
+      // Get computed gap from content element (defaults to 0 if not set)
+      const contentElement = contentRef.current;
+      const computedGap = contentElement ? parseFloat(getComputedStyle(contentElement).gap) || 0 : 0;
+      const maxWidth = contentWidth - MIN_SHIPMENTS_WIDTH - RESIZER_WIDTH - computedGap;
       const nextWidth = Math.min(
         Math.max(MIN_DETAILS_WIDTH, resizeStateRef.current.startWidth - delta),
         Math.max(MIN_DETAILS_WIDTH, maxWidth)
@@ -443,10 +505,18 @@ export const SchedulePageNew = ({
   return (
     <PageLayout
       activeStep="schedule"
-      onStepClick={onStepClick}
+      onStepClick={(step) => {
+        if (step === "shipment") {
+          onStepClick(step);
+        }
+      }}
       selectedSite={selectedSite}
       onSiteChange={onSiteChange}
       siteOptions={siteOptions}
+      selectedDate={selectedDate}
+      onDateChange={setSelectedDate}
+      minDate={getMinDate()}
+      maxDate={getMaxDate()}
     >
       <main className={`content ${isResizing ? "resizing" : ""}`} ref={contentRef}>
         <section className="panel shipments-panel">
@@ -536,7 +606,26 @@ export const SchedulePageNew = ({
           </div>
 
           <div className="appointment-time-selector">
-            <h3 className="appointment-time-selector-title">Select Date and Time</h3>
+            <h3 className="appointment-time-selector-title">Available Appointments</h3>
+            {onTermsClick && (
+              <div style={{ 
+                padding: "0px 0 16px 0", 
+                textAlign: "center"
+              }}>
+                <span
+                  onClick={onTermsClick}
+                  style={{
+                    color: "var(--color-text-brand-primary)",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    fontSize: "14px",
+                    fontWeight: 400
+                  }}
+                >
+                  Appointment Guidelines
+                </span>
+              </div>
+            )}
             <div className="appointment-date-navigation">
               <div className="appointment-dates-container">
                 <div className="appointment-dates-headers">
@@ -571,9 +660,15 @@ export const SchedulePageNew = ({
                 <div className="appointment-time-slots-scroll-wrapper">
                   <div className="appointment-time-slots-container">
                     {displayDates.map((date) => {
-                      const timeSlots = generateTimeSlots(date);
+                      // Include selected time and original time in slots if this is the selected date
+                      const isSelectedDate = selectedDate && selectedDate.toDateString() === date.toDateString();
+                      const timeSlots = generateTimeSlots(
+                        date, 
+                        isSelectedDate ? selectedTime || undefined : undefined,
+                        isSelectedDate && originalScheduledTime ? originalScheduledTime : undefined
+                      );
                       const dateKey = date.toISOString();
-                      const isSelected = selectedDate && selectedDate.toDateString() === date.toDateString();
+                      const isSelected = isSelectedDate;
                       
                       return (
                         <div key={dateKey} className="appointment-date-column-slots">
@@ -668,15 +763,6 @@ export const SchedulePageNew = ({
                       {questionAnswers?.question2 && (
                         <span className="details-tag">{questionAnswers.question2}</span>
                       )}
-                      {questionAnswers?.question3 && (
-                        <span className="details-tag">{questionAnswers.question3}</span>
-                      )}
-                      {questionAnswers?.question4 && (
-                        <span className="details-tag">{questionAnswers.question4}</span>
-                      )}
-                      {questionAnswers?.question5 && (
-                        <span className="details-tag">{questionAnswers.question5}</span>
-                      )}
                     </div>
                   </div>
                 )}
@@ -744,16 +830,8 @@ export const SchedulePageNew = ({
                   <div className="details-info-row">
                     <span className="details-info-label">Trailer #:</span>
                     <span className="details-info-value">
-                      {trailerNumber || "--"}
+                      {"--"}
                     </span>
-                  </div>
-                  <div className="details-info-row">
-                    <span className="details-info-label">Driver:</span>
-                    <span className="details-info-value">{driverName || "--"}</span>
-                  </div>
-                  <div className="details-info-row">
-                    <span className="details-info-label">Mobile:</span>
-                    <span className="details-info-value">{mobileNumber || "--"}</span>
                   </div>
                 </div>
               </div>
@@ -764,7 +842,7 @@ export const SchedulePageNew = ({
 
       <div className="action-bar">
         <div className="footer-actions">
-          <button className="secondary" type="button">
+          <button className="secondary" type="button" onClick={onCancel}>
             Cancel
           </button>
           <button 
@@ -772,8 +850,8 @@ export const SchedulePageNew = ({
             type="button" 
             disabled={!selectedTime}
             onClick={() => {
-              if (selectedTime && onStepClick) {
-                onStepClick("driver");
+              if (selectedTime && onComplete) {
+                onComplete();
               }
             }}
           >
@@ -787,6 +865,12 @@ export const SchedulePageNew = ({
           <span>Contact</span>
           <span>Customer Support</span>
           <span>Products</span>
+          <span 
+            style={{ cursor: "pointer" }}
+            onClick={onTermsClick}
+          >
+            Terms and Conditions
+          </span>
         </div>
         <div className="footer-copyright">
           © 2026 Chamberlain Group. All Rights Reserved

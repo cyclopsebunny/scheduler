@@ -3,7 +3,7 @@ import userIcon from "../assets/user.svg";
 import facilityIcon from "../assets/facility.svg";
 import { Dropdown } from "./Dropdown";
 
-type Step = "shipment" | "schedule" | "driver" | "trailer";
+type Step = "shipment" | "schedule";
 
 type PageLayoutProps = {
   activeStep: Step;
@@ -12,6 +12,11 @@ type PageLayoutProps = {
   onSiteChange: (site: string) => void;
   siteOptions: string[];
   children: React.ReactNode;
+  showStepper?: boolean;
+  selectedDate?: Date | null;
+  onDateChange?: (date: Date | null) => void;
+  minDate?: Date;
+  maxDate?: Date;
 };
 
 export const PageLayout = ({
@@ -21,12 +26,15 @@ export const PageLayout = ({
   onSiteChange,
   siteOptions,
   children,
+  showStepper = true,
+  selectedDate,
+  onDateChange,
+  minDate,
+  maxDate,
 }: PageLayoutProps) => {
   const steps: { key: Step; label: string }[] = [
     { key: "shipment", label: "Shipment" },
     { key: "schedule", label: "Schedule" },
-    { key: "driver", label: "Driver" },
-    { key: "trailer", label: "Trailer" },
   ];
 
   return (
@@ -46,27 +54,29 @@ export const PageLayout = ({
         </div>
       </header>
 
-      <section className="stepper">
-        {steps.map((step) => (
-          <div
-            key={step.key}
-            className={`step ${activeStep === step.key ? "active" : ""} ${activeStep !== step.key ? "clickable" : ""}`}
-            onClick={() => activeStep !== step.key && onStepClick(step.key)}
-            role="button"
-            tabIndex={activeStep !== step.key ? 0 : -1}
-            onKeyDown={(e) => {
-              if ((e.key === "Enter" || e.key === " ") && activeStep !== step.key) {
-                e.preventDefault();
-                onStepClick(step.key);
-              }
-            }}
-            aria-label={`Go to ${step.label} step`}
-          >
-            <span className="step-dot" />
-            <span className="step-label">{step.label}</span>
-          </div>
-        ))}
-      </section>
+      {showStepper && (
+        <section className="stepper">
+          {steps.map((step) => (
+            <div
+              key={step.key}
+              className={`step ${activeStep === step.key ? "active" : ""} ${activeStep !== step.key ? "clickable" : ""}`}
+              onClick={() => activeStep !== step.key && onStepClick(step.key)}
+              role="button"
+              tabIndex={activeStep !== step.key ? 0 : -1}
+              onKeyDown={(e) => {
+                if ((e.key === "Enter" || e.key === " ") && activeStep !== step.key) {
+                  e.preventDefault();
+                  onStepClick(step.key);
+                }
+              }}
+              aria-label={`Go to ${step.label} step`}
+            >
+              <span className="step-dot" />
+              <span className="step-label">{step.label}</span>
+            </div>
+          ))}
+        </section>
+      )}
 
       {children}
     </div>
