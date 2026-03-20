@@ -1,5 +1,7 @@
-# Deploy static build to GitHub Pages (Settings → Pages → Source: GitHub Actions).
-# Site URL: https://<user>.github.io/scheduler/ — keep --base in build:gh-pages in sync with the repo name.
+# Deploy static build to GitHub Pages.
+# REQUIRED: Repo Settings → Pages → Build and deployment → Source: "GitHub Actions" (NOT "Deploy from a branch").
+# Branch deploy publishes raw repo index.html (/src/main.tsx → 404). This workflow publishes Vite dist/.
+# Site: https://cyclopsebunny.github.io/scheduler/ — keep npm run build:gh-pages base in sync with repo name.
 name: Deploy to GitHub Pages
 
 on:
