@@ -8,8 +8,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
-dist-ssr
+# Root Vite output only (keep packages/component-library/dist vendored)
+/dist
+/dist-ssr
 *.local
 
 # Editor directories and files
@@ -31,5 +32,5 @@ dist-ssr
 .env.production.local
 
 # Build outputs
-build
+/build
 *.tsbuildinfo

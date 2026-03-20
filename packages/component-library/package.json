@@ -1,0 +1,23 @@
+{
+  "name": "@component-library/core",
+  "version": "0.1.0",
+  "description": "React component library (vendored for scheduler; built output from design system)",
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./tokens": "./src/tokens/index.ts",
+    "./styles": "./dist/styles.css"
+  },
+  "files": ["dist", "src"],
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "license": "MIT"
+}
