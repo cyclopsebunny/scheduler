@@ -1,7 +1,10 @@
-# Deploy static build to GitHub Pages.
-# REQUIRED: Repo Settings → Pages → Build and deployment → Source: "GitHub Actions" (NOT "Deploy from a branch").
-# Branch deploy publishes raw repo index.html (/src/main.tsx → 404). This workflow publishes Vite dist/.
-# Site: https://cyclopsebunny.github.io/scheduler/ — keep npm run build:gh-pages base in sync with repo name.
+# Pushes production build to branch `gh-pages`. GitHub Pages then serves that branch only (no repo source files).
+#
+# Setup (once): Repo → Settings → Pages → Build and deployment → Source: "Deploy from a branch"
+#   Branch: gh-pages  ·  Folder: / (root)  ·  Save
+#
+# Site: https://cyclopsebunny.github.io/scheduler/
+# If the repo is renamed, update npm script build:gh-pages (--base=/NEWNAME/).
 name: Deploy to GitHub Pages
 
 on:
@@ -10,35 +13,29 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: github-pages
+  cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: npm
+
       - run: npm ci
       - run: npm run build:gh-pages
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/deploy-pages@v4
-        id: deployment
+      - name: Push dist to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          force_orphan: true
